@@ -9,6 +9,9 @@
     margin-right: 10px;
     object-fit: cover;
 }
+.tableCell{
+    background-color: white;
+}
 .status{
     padding: 5px;
     border-radius: 5px;
