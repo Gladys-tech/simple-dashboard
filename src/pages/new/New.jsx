@@ -12,11 +12,11 @@ const New = ({inputs, title}) => {
    const[newInput, setNewInput] =useState("")
    const createTodo =async () =>{
       await addDoc(todoCollectionRef,{input: newInput});
-      alert("to-do created"); 
+      alert("product created"); 
    }
 
 
-   const [todo, setTodo] = useState([]);
+  //  const [todo, setTodo] = useState([]);
   const todoCollectionRef = collection(db, "todo");
 
   const [file, setFile] = useState("");
@@ -46,30 +46,7 @@ const New = ({inputs, title}) => {
                 <input type={input.type} placeholder={input.placeholder} onChange={(event)=>{setNewInput(event.target.value);}}/>
               </div>
               ))}
-              {/* <div className='formInput'>
-                <label>full names</label>
-                <input type="text" placeholder="gladys kulyenvu"/>
-              </div>
-              <div className='formInput'>
-                <label>Email</label>
-                <input type="email" placeholder="gladys@gmail.com"/>
-              </div>
-              <div className='formInput'>
-                <label>phone no</label>
-                <input type="text" placeholder="0757763516"/>
-              </div>
-              <div className='formInput'>
-                <label>password</label>
-                <input type="password" />
-              </div>
-              <div className='formInput'>
-                <label>Address</label>
-                <input type="text" placeholder="kampala"/>
-              </div>
-              <div className='formInput'>
-                <label>country</label>
-                <input type="text" placeholder="uganda"/>
-              </div> */}
+              
               <button onClick={createTodo}>send</button>
             </form>
           </div>

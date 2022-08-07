@@ -37,7 +37,9 @@ const Sidebar = () => {
             <Link to="/products" style={{textDecoration: "none"}}>
             <li><InventoryIcon  className='icon'/><span>products</span></li>
             </Link>
+            <Link to="/orders" style={{textDecoration: "none"}}>
             <li><BorderColorIcon  className='icon'/><span>orders</span></li>
+            </Link>
             <li><LocalShippingIcon  className='icon'/><span>delivery</span></li>
             <li>< NotificationsNoneIcon  className='icon'/><span>notifications</span></li>
             <li><PauseCircleFilledIcon  className='icon'/><span>status</span></li>

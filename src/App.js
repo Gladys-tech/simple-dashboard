@@ -17,6 +17,7 @@ import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import Singles from "./pages/singles/Singles";
 import Lists from "./pages/lists/Lists";
+import Order from "./pages/orderdetails/Order";
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           <Route path=":productId" element={<Singles />} />
           <Route path="new" element={<New inputs={productInputs}  title="Add new product"/>} />
         </Route>
+        <Route path="orders" element={<Order />} />
       </Route>
     </Routes>
   </BrowserRouter>
