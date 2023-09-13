@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import "./table.css";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,105 +9,143 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
+const List = ({ userId, userEmail }) => {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const List = () => {
+  useEffect(() => {
+    if (userEmail) {
+      // Fetch orders for the specific user by email
+      axios.get(`http://localhost:5000/api/orders/getordersbyemail/${userEmail}`)
+        .then((response) => {
+          if (response.data) {
+            setOrders(response.data);
+            setLoading(false);
+          } else {
+            console.error('Empty response data');
+            setLoading(false);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+          setLoading(false);
+        });
+    } else {
+      // Fetch all orders
+      axios.get('http://localhost:5000/api/orders/getallorders')
+        .then((response) => {
+          if (response.data) {
+            setOrders(response.data);
+            setLoading(false);
+          } else {
+            console.error('Empty response data');
+            setLoading(false);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+          setLoading(false);
+        });
+    }
+  }, [userEmail, userId]);
+  
+  const handleStatusToggle = (orderId) => {
+    // Find the order in the local state
+    const orderToUpdate = orders.find((order) => order._id === orderId);
 
-  const rows =[
-    {
-      id:1143155,
-      img:"https://m.media-amazon.com/images/I/81bc8mA3nkL._AC_UY327_FMwebp_QL65_.jpg",
-      product:"Acer Nitro 5",
-      customer:"john smith",
-      date:"1 march",
-      amount:785,
-      method:"cash on delivery",
-      status:"Approved",
-    },
-    {
-      id:1143155,
-      img:"https://m.media-amazon.com/images/I/81bc8mA3nkL._AC_UY327_FMwebp_QL65_.jpg",
-      product:"Acer Nitro 5",
-      customer:"john smith",
-      date:"1 march",
-      amount:785,
-      method:"cash on delivery",
-      status:"Pending",
-    },
-    {
-      id:11431556,
-      img:"https://m.media-amazon.com/images/I/81bc8mA3nkL._AC_UY327_FMwebp_QL65_.jpg",
-      product:"Acer Nitro 5",
-      customer:"john smith",
-      date:"1 march",
-      amount:785,
-      method:"cash on delivery",
-      status:"Pending",
-    },
-    {
-      id:11431,
-      img:"https://m.media-amazon.com/images/I/81bc8mA3nkL._AC_UY327_FMwebp_QL65_.jpg",
-      product:"Acer Nitro 5",
-      customer:"john smith",
-      date:"1 march",
-      amount:785,
-      method:"online payment",
-      status:"Approved",
-    },
-    {
-      id:11155,
-      img:"https://m.media-amazon.com/images/I/81bc8mA3nkL._AC_UY327_FMwebp_QL65_.jpg",
-      product:"Acer Nitro 5",
-      customer:"john smith",
-      date:"1 march",
-      amount:785,
-      method:"cash on delivery",
-      status:"Pending",
-    },
-  ]
+    if (!orderToUpdate) {
+      console.error('Order not found in local state');
+      return;
+    }
+
+    // Toggle the status
+    const newStatus = orderToUpdate.status === "Approved" ? "Pending" : "Approved";
+    
+    // Send a PUT request to update the status in the database
+    axios.put(`http://localhost:5000/api/orders/updatestatus/${orderId}`, {
+      status: newStatus,
+    })
+    .then((response) => {
+      if (response.data.success) {
+        // Update the status in the local state
+        const updatedOrders = orders.map((order) =>
+          order._id === orderId ? { ...order, status: newStatus } : order
+        );
+        setOrders(updatedOrders);
+      } else {
+        console.error('Status update failed');
+      }
+    })
+    .catch((error) => {
+      console.error('Error updating status:', error);
+    });
+  };
+
+  // Filter orders based on the selected user's ID
+  const filteredOrders = userEmail 
+    ? orders.filter((order) => order.userEmail === userEmail)
+    : orders;
+    console.log('Filtered Orders:', filteredOrders);
+
   return (
     <div className='table'>
       <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>tracking id</TableCell>
-            
-            <TableCell className='tableCell'>product</TableCell>
-            <TableCell className='tableCell'>customer</TableCell>
-            <TableCell className='tableCell'>date</TableCell>
-            <TableCell className='tableCell'>amount</TableCell>
-            <TableCell className='tableCell'>payment method</TableCell>
-            <TableCell className='tableCell'>status</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.id}
-              
-            >
-              <TableCell >
-                {row.id}
-              </TableCell>
-              <TableCell className='tableCell'>
-                <div className='cellWrapper'>
-                  <img src={row.img} alt="" className='image'/>
-                  {row.product}
-                </div>
-              </TableCell>
-              <TableCell className='tableCell'>{row.customer}</TableCell>
-              <TableCell className='tableCell'>{row.date}</TableCell>
-              <TableCell className='tableCell'>{row.amount}</TableCell>
-              <TableCell className='tableCell'>{row.method}</TableCell>
-              <TableCell className='tableCell'>
-                <span className={`status ${row.status}`}>{row.status}</span></TableCell>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Order ID</TableCell>
+              <TableCell className='tableCell'>OrderItems</TableCell>
+              <TableCell className='tableCell'>Customer</TableCell>
+              <TableCell className='tableCell'>Date</TableCell>
+              <TableCell className='tableCell'>Amount</TableCell>
+              <TableCell className='tableCell'>Payment Method</TableCell>
+              <TableCell className='tableCell'>Status</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7}>Loading...</TableCell>
+              </TableRow>
+            ) : (
+              filteredOrders.map((order) => (
+                <TableRow key={order._id}>
+                  <TableCell>{order._id}</TableCell>
+                  <TableCell className='tableCell'>
+                    <div className='cellWrapper'>
+                      <ul>
+                        {order.orderItems.map((orderItem) => (
+                          <li key={orderItem._id}>
+                            {orderItem.name} - Quantity: {orderItem.Quantity}, Price: {orderItem.price}, Variant: {orderItem.variant}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </TableCell>
+                  <TableCell className='tableCell'>{order.name}</TableCell>
+                  <TableCell className='tableCell'>{new Date(order.createdAt).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}</TableCell>
+                  <TableCell className='tableCell'>{`$${order.orderAmount.toFixed(2)}`}</TableCell>
+                  <TableCell className='tableCell'>Cash on Delivery</TableCell>
+                  <TableCell className='tableCell'>
+                    <span
+                      className={`status ${order.status}`}
+                      onClick={() => handleStatusToggle(order._id)}
+                    >
+                      {order.status}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
-  )
+  );
 }
 
 export default List;

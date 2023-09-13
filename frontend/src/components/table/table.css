@@ -15,6 +15,9 @@
 .status{
     padding: 5px;
     border-radius: 5px;
+    font-weight: bold;
+  text-align: center;
+  cursor: pointer;
 }
 .status.Approved{
     color: green;

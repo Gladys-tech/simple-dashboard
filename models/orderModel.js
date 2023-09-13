@@ -9,7 +9,8 @@ const orderSchema = mongoose.Schema({
     orderAmount:{type: Number, required: true},
     isDelivered:{type: Boolean,  default:false},
     contact: {type:Number, required: true},
-    
+    status: { type: String, default: 'Pending' },
+    userId: String,
     
    
   

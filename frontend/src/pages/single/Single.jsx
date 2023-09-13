@@ -12,6 +12,7 @@ const Single = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
     const { id: userId } = useParams();
+    const { email: userEmail } = useParams();
 
     useEffect(() => {
       // Replace this with your API endpoint to fetch user data
@@ -28,7 +29,7 @@ const Single = () => {
   })
   .catch((error) => {
     console.error('Error fetching user data:', error);
-    // console.error('Response text:', error.response.text());
+    
   });
 
     }, [userId]);
@@ -76,7 +77,7 @@ const Single = () => {
           </div>
           <div className='bottom2'>
             <h1 className='title'>Last Transaction</h1>
-            <List />
+            <List userId={userId} userEmail={userEmail} />
           </div>
         </div>
       </div>
