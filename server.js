@@ -99,10 +99,8 @@ app.put('/api/orders/updatestatus/:id', async (req, res) => {
 app.get('/api/orders/getordersbyemail/:email', async (req, res) => {
   try {
     const userEmail = req.params.email;
-
     // Fetch orders for the specific user by email
     const orders = await orderModel.find({ userEmail });
-
     res.json(orders);
   } catch (error) {
     console.error('Error fetching orders by email:', error);
