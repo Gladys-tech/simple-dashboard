@@ -47,19 +47,39 @@ const List = ({ userId, userEmail }) => {
           setLoading(false);
         });
     }
-  }, [userEmail, userId]);
+  }, [userEmail]);
+
+   // Filter orders based on the selected user's email
+   const filteredOrders = userEmail 
+   ? orders.filter((order) => order.email === userEmail)
+   : orders;
+     console.log('User Email:', userEmail);
+     console.log('Orders Length:', orders.length);
+ orders.forEach((order) => {
+   console.log('Order Email:', order.email);
+ });
+ 
+     console.log('Filtered Orders:', filteredOrders);
+  
   
   const handleStatusToggle = (orderId) => {
     // Find the order in the local state
     const orderToUpdate = orders.find((order) => order._id === orderId);
-
+  
     if (!orderToUpdate) {
       console.error('Order not found in local state');
       return;
     }
-
-    // Toggle the status
-    const newStatus = orderToUpdate.status === "Approved" ? "Pending" : "Approved";
+  
+    // Determine the next status based on the current status
+    let newStatus;
+    if (orderToUpdate.status === "Approved") {
+      newStatus = "Delivered";
+    } else if (orderToUpdate.status === "Delivered") {
+      newStatus = "Pending";
+    } else {
+      newStatus = "Approved";
+    }
     
     // Send a PUT request to update the status in the database
     axios.put(`http://localhost:5000/api/orders/updatestatus/${orderId}`, {
@@ -80,12 +100,9 @@ const List = ({ userId, userEmail }) => {
       console.error('Error updating status:', error);
     });
   };
+  
 
-  // Filter orders based on the selected user's ID
-  const filteredOrders = userEmail 
-    ? orders.filter((order) => order.userEmail === userEmail)
-    : orders;
-    console.log('Filtered Orders:', filteredOrders);
+ 
 
   return (
     <div className='table'>

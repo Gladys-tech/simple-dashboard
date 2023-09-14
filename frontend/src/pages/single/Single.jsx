@@ -11,29 +11,35 @@ const Single = () => {
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-    const { id: userId } = useParams();
-    const { email: userEmail } = useParams();
+  const { id: userId } = useParams();
+  const { email: userEmail } = useParams();
 
-    useEffect(() => {
-      // Replace this with your API endpoint to fetch user data
-      fetch(`http://localhost:5000/api/users/${userId}`)
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return(response.json()) ;
-  })
-  .then((data) => {
-    setUserData(data);
-    setLoading(false);
-  })
-  .catch((error) => {
-    console.error('Error fetching user data:', error);
-    
-  });
+  if (!userEmail) {
+    // Handle the case where userEmail is missing or invalid
+    console.error('Invalid userEmail:', userEmail);
+    // You can redirect the user to an error page or take appropriate action.
+  }
 
-    }, [userId]);
-    
+  useEffect(() => {
+    // Replace this with your API endpoint to fetch user data
+    fetch(`http://localhost:5000/api/users/${userId}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return (response.json());
+      })
+      .then((data) => {
+        setUserData(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching user data:', error);
+
+      });
+
+  }, [userId]);
+
   return (
     <div className='single'>
       <Sidebar />

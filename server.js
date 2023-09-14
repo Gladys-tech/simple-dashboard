@@ -46,7 +46,7 @@ app.get('/api/orders/getallorders', async (req, res) =>{
   .then(orders => res.json(orders))
   .catch(err => res.json(err))
 });
-// Define a route to handle order statuses
+// route for status update
 app.put('/api/orders/updatestatus/:id', async (req, res) => {
   const orderId = req.params.id;
 
@@ -58,8 +58,18 @@ app.put('/api/orders/updatestatus/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
+    // Determine the next status based on the current status
+    let newStatus;
+    if (order.status === "Approved") {
+      newStatus = "Delivered";
+    } else if (order.status === "Delivered") {
+      newStatus = "Pending";
+    } else {
+      newStatus = "Approved";
+    }
+
     // Toggle the status
-    order.status = req.body.status;
+    order.status = newStatus;
 
     // Save the updated order
     await order.save();
@@ -95,19 +105,19 @@ app.put('/api/orders/updatestatus/:id', async (req, res) => {
   }
 });
 
+
 // Modify the route to get orders by user's email
 app.get('/api/orders/getordersbyemail/:email', async (req, res) => {
   try {
-    const userEmail = req.params.email;
-    // Fetch orders for the specific user by email
-    const orders = await orderModel.find({ userEmail });
+    const userEmail = req.params.email.trim().toLowerCase(); // Trim and convert to lowercase
+    // Use a case-insensitive query with a regular expression
+    const orders = await orderModel.find({ userEmail: new RegExp('^' + userEmail + '$', 'i') });
     res.json(orders);
   } catch (error) {
     console.error('Error fetching orders by email:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
 
 // Define a route to fetch users

@@ -1,10 +1,15 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '../../components/navbar/Navbar';
 import Sidebar from '../../components/sidebar/Sidebar';
 import "./order.css";
-
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 function Order({ setOrdersCount }) {
   const [orders, setOrders] = useState([]);
@@ -18,8 +23,8 @@ function Order({ setOrdersCount }) {
           console.log('Data:', response.data);
           setOrders(response.data);
           setLoading(false);
-           // Pass the orders.length to the parent component (Home)
-           setOrdersCount(response.data.length);
+          // Pass the orders.length to the parent component (Home)
+          setOrdersCount(response.data.length);
         } else {
           console.error('Empty response data');
           setLoading(false);
@@ -31,68 +36,70 @@ function Order({ setOrdersCount }) {
       });
   }, []);
 
+  
   return (
     <div className='order'>
       <Sidebar />
       <div className='orderContainer'>
         <Navbar />
-        {/* getting oders */}
-
-        <h1>Orders Available</h1>
+        {/* getting orders */}
+        <div className='datatableTitle'>
+        All Orders
+        
+      </div>
         {loading ? (
           <div>Loading...</div>
         ) : (
           <div className="App-header">
-            <table>
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer</th>
-                  <th>OrderItems</th>
-                  <th>Order Total</th>
-                  <th>address</th>
-                  <th>contact</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((order) => (
-                  <tr key={order._id}>
-                    <td> {order._id}</td>
-                    <td> {order.name}</td>
-                    <td>
-                      <ul>
-                        {order.orderItems.map((orderItem) => (
-                          <li key={orderItem.productName}>
-                            {orderItem.name}- Quantity:{orderItem.Quantity}, Price:{orderItem.price}, Variant:{orderItem.variant}
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td>ush{order.orderAmount.toFixed(2)}</td>
-                    <td>{order.address}</td>
-                    <td>{order.contact}</td>
-                    <td>
-                      {new Date(order.createdAt).toLocaleDateString(undefined, {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </td>
-                  </tr>
-                ))}
-                <td></td>
-              </tbody>
-            </table>
-
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Order ID</TableCell>
+                    <TableCell>Customer</TableCell>
+                    <TableCell>OrderItems</TableCell>
+                    <TableCell>Order Total</TableCell>
+                    <TableCell>Address</TableCell>
+                    <TableCell>Contact</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {orders.map((order) => (
+                    <TableRow key={order._id}>
+                      <TableCell>{order._id}</TableCell>
+                      <TableCell>{order.name}</TableCell>
+                      <TableCell>
+                        <ul>
+                          {order.orderItems.map((orderItem) => (
+                            <li key={orderItem.productName}>
+                              {orderItem.name}- Quantity:{orderItem.Quantity}, Price:{orderItem.price}, Variant:{orderItem.variant}
+                            </li>
+                          ))}
+                        </ul>
+                      </TableCell>
+                      <TableCell>ush{order.orderAmount.toFixed(2)}</TableCell>
+                      <TableCell>{order.address}</TableCell>
+                      <TableCell>{order.contact}</TableCell>
+                      <TableCell>
+                        {new Date(order.createdAt).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </TableCell>
+                      <TableCell className={`status ${order.status}`}>{order.status}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </div>
         )}
-
       </div>
     </div>
-
   );
 }
 
 export default Order;
-
